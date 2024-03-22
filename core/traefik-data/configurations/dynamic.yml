@@ -11,6 +11,7 @@ http:
     user-auth:
       basicAuth:
         users:
+          # TODO: Change this. https://www.web2generators.com/apache-tools/htpasswd-generator
           - "raf:$apr1$MTqfVwiE$FKkzT5ERGFqwH9f3uipxA1"
 
 tls:

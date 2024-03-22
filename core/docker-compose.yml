@@ -1,48 +1,50 @@
-version: "3.8"
+version: "3"
 
 services:
   traefik:
-    image: "traefik:latest"
-    container_name: traefik
+    container_name: ${COMPOSE_PROJECT_NAME}-traefik
+    image: traefik:latest
     restart: unless-stopped
     security_opt:
-      - "no-new-privileges:true"
+      - no-new-privileges:true
     networks:
       - proxy
     ports:
-      - "80:80"
-      - "443:443"
+      - 80:80
+      - 443:443
     volumes:
-      - "/etc/localtime:/etc/localtime:ro"
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "./traefik-data/traefik.yml:/traefik.yml:ro"
-      - "./traefik-data/acme.json:/acme.json"
-      - "./traefik-data/configurations:/configurations"
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./traefik-data/traefik.yml:/traefik.yml:ro
+      - ./traefik-data/acme.json:/acme.json
+      - ./traefik-data/configurations:/configurations
     labels:
       - traefik.enable=true
       - traefik.docker.network=proxy
       - traefik.http.routers.traefik-secure.entrypoints=websecure
-      - traefik.http.routers.traefik-secure.rule=Host(`traefik.yourdomain.com`)
+      - traefik.http.routers.traefik-secure.rule=Host(`${TRAEFIK_DOMAIN}`)
       - traefik.http.routers.traefik-secure.service=api@internal
       - traefik.http.routers.traefik-secure.middlewares=user-auth@file
+      # TODO: is this necessary??
+      # - traefik.http.routers.traefik.tls.certresolver=letsencrypt
 
   portainer:
-    image: "portainer/portainer-ce:latest"
-    container_name: portainer
+    container_name: ${COMPOSE_PROJECT_NAME}-portainer
+    image: portainer/portainer-ce:latest
     restart: unless-stopped
     security_opt:
-      - "no-new-privileges:true"
+      - no-new-privileges:true
     networks:
       - proxy
     volumes:
-      - "/etc/localtime:/etc/localtime:ro"
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "./portainer-data:/data"
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./portainer-data:/data
     labels:
       - traefik.enable=true
       - traefik.docker.network=proxy
       - traefik.http.routers.portainer-secure.entrypoints=websecure
-      - traefik.http.routers.portainer-secure.rule=Host(`portainer.yourdomain.com`)
+      - traefik.http.routers.portainer-secure.rule=Host(`${PORTAINER_DOMAIN}`)
       - traefik.http.routers.portainer-secure.service=portainer
       - traefik.http.services.portainer.loadbalancer.server.port=9000
 

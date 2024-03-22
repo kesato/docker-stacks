@@ -1,0 +1,26 @@
+version: "3"
+
+services:
+  nextjs:
+    container_name: ${COMPOSE_PROJECT_NAME}-nextjs
+    image: ${NEXTJS_GHCR_REPO}
+    restart: unless-stopped
+    volumes:
+      - ./cache/images:/app/.next/cache/images
+    env_file: .env
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=proxy
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-nextjs.tls=true
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-nextjs.entrypoints=websecure
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-nextjs.tls.certresolver=letsencrypt
+      - traefik.http.services.${COMPOSE_PROJECT_NAME}-nextjs.loadbalancer.server.port=3000
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-nextjs.rule=Host(`${NEXTJS_DOMAIN}`)
+    networks:
+      - proxy
+    expose:
+      - 3000
+
+networks:
+  proxy:
+    external: true

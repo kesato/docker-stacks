@@ -1,0 +1,48 @@
+version: "3"
+
+services:
+  payloadcms:
+    container_name: ${COMPOSE_PROJECT_NAME}-payloadcms
+    image: ${PAYLOADCMS_GHCR_REPO}
+    restart: unless-stopped
+    volumes:
+      - ./medias:/app/media
+      - ./logs:/app/logs
+    environment:
+      - NODE_ENV=production
+    env_file: ./.env
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=proxy
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-payloadcms.tls=true
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-payloadcms.tls.certresolver=letsencrypt
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-payloadcms.entrypoints=websecure
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-payloadcms.rule=Host(`${PAYLOADCMS_DOMAIN}`)
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-payloadcms.service=${COMPOSE_PROJECT_NAME}-payloadcms
+      - traefik.http.services.${COMPOSE_PROJECT_NAME}-payloadcms.loadbalancer.server.port=3001
+    networks:
+      - proxy
+      - backend
+    expose:
+      - 3001
+    depends_on:
+      - mongo
+
+  mongo:
+    container_name: ${COMPOSE_PROJECT_NAME}-mongo
+    image: mongo:4-bionic
+    command:
+      - --storageEngine=wiredTiger
+    volumes:
+      - ./mongodb:/data/db
+    networks:
+      - backend
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_DATABASE}
+
+networks:
+  proxy:
+    external: true
+  backend:
