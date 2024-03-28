@@ -2,7 +2,7 @@ version: "3"
 
 services:
   traefik:
-    container_name: ${COMPOSE_PROJECT_NAME}-traefik
+    container_name: docker-stacks-traefik
     image: traefik:latest
     restart: unless-stopped
     security_opt:
@@ -22,13 +22,14 @@ services:
       - traefik.enable=true
       - traefik.docker.network=proxy
       - traefik.http.routers.traefik-secure.entrypoints=websecure
-      - traefik.http.routers.traefik-secure.rule=Host(`${TRAEFIK_DOMAIN}`)
+      # TODO: set your domain here
+      - traefik.http.routers.traefik-secure.rule=Host(`traefik.yourdomain.com`)
       - traefik.http.routers.traefik-secure.service=api@internal
       - traefik.http.routers.traefik-secure.middlewares=user-auth@file
       - traefik.http.routers.traefik.tls.certresolver=letsencrypt
 
   portainer:
-    container_name: ${COMPOSE_PROJECT_NAME}-portainer
+    container_name: docker-stacks-portainer
     image: portainer/portainer-ce:latest
     restart: unless-stopped
     security_opt:
@@ -43,7 +44,8 @@ services:
       - traefik.enable=true
       - traefik.docker.network=proxy
       - traefik.http.routers.portainer-secure.entrypoints=websecure
-      - traefik.http.routers.portainer-secure.rule=Host(`${PORTAINER_DOMAIN}`)
+      # TODO: set your domain here
+      - traefik.http.routers.portainer-secure.rule=Host(`portainer.yourdomain.com`)
       - traefik.http.routers.portainer-secure.service=portainer
       - traefik.http.services.portainer.loadbalancer.server.port=9000
 

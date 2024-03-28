@@ -2,8 +2,10 @@ version: "3"
 
 services:
   payloadcms:
-    container_name: ${COMPOSE_PROJECT_NAME}-payloadcms
-    image: ${PAYLOADCMS_GHCR_REPO}
+    # TODO: change all label `projectname`
+    container_name: projectname-payloadcms
+    # TODO: set your repo here
+    image: ghcr.io/user/repository:main
     restart: unless-stopped
     volumes:
       - ./medias:/app/media
@@ -14,12 +16,13 @@ services:
     labels:
       - traefik.enable=true
       - traefik.docker.network=proxy
-      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-payloadcms.tls=true
-      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-payloadcms.tls.certresolver=letsencrypt
-      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-payloadcms.entrypoints=websecure
-      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-payloadcms.rule=Host(`${PAYLOADCMS_DOMAIN}`)
-      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-payloadcms.service=${COMPOSE_PROJECT_NAME}-payloadcms
-      - traefik.http.services.${COMPOSE_PROJECT_NAME}-payloadcms.loadbalancer.server.port=3001
+      - traefik.http.routers.projectname-payloadcms.tls=true
+      - traefik.http.routers.projectname-payloadcms.tls.certresolver=letsencrypt
+      - traefik.http.routers.projectname-payloadcms.entrypoints=websecure
+      # TODO: set your domain here
+      - traefik.http.routers.projectname-payloadcms.rule=Host(`backend.yourdomain.com`)
+      - traefik.http.routers.projectname-payloadcms.service=projectname-payloadcms
+      - traefik.http.services.projectname-payloadcms.loadbalancer.server.port=3001
     networks:
       - proxy
       - backend
@@ -29,7 +32,7 @@ services:
       - mongo
 
   mongo:
-    container_name: ${COMPOSE_PROJECT_NAME}-mongo
+    container_name: projectname-mongo
     image: mongo:4-bionic
     command:
       - --storageEngine=wiredTiger
@@ -38,9 +41,10 @@ services:
     networks:
       - backend
     environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
-      MONGO_INITDB_DATABASE: ${MONGO_DATABASE}
+      # TODO: set database credential
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+      MONGO_INITDB_DATABASE: databasename
 
 networks:
   proxy:
