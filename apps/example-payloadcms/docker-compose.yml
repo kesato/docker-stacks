@@ -5,7 +5,7 @@ services:
     # TODO: change all label `projectname`
     container_name: projectname-payloadcms
     # TODO: set your repo here
-    image: ghcr.io/user/repository:main
+    image: ghcr.io/user/repository:deploy
     restart: unless-stopped
     volumes:
       - ./medias:/app/media
