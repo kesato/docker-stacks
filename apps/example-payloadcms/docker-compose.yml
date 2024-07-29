@@ -33,9 +33,11 @@ services:
 
   mongo:
     container_name: projectname-mongo
-    image: mongo:4-bionic
-    command:
-      - --storageEngine=wiredTiger
+    image: mongo:7-jammy
+    restart: unless-stopped
+    # No need since mongo 7
+    # command:
+    #   - --storageEngine=wiredTiger
     volumes:
       - ./mongodb:/data/db
     networks:
